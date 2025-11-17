@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+<h1><%= recipe.title %></h1>
+<p><strong>By:</strong> <%= recipe.author %></p>
+<p><strong>Cuisine:</strong> <%= recipe.cuisine %></p>
+<p><strong>Meal Type:</strong> <%= recipe.meal_type %></p>
+<p><strong>Difficulty:</strong> <%= recipe.difficulty %></p>
+<p><strong>Cooking Time:</strong> <%= recipe.cooking_time %> mins</p>
+
+<h3>Ingredients</h3>
+<ul>
+  <% ingredients.forEach(i => { %>
+    <li><%= i.name %></li>
+  <% }) %>
+</ul>
+
+<h3>Tags</h3>
+<p>
+  <% tags.forEach(t => { %>
+    <span class="tag"><%= t.name %></span>
+  <% }) %>
+</p>
+
+<h3>Instructions</h3>
+<p><%= recipe.instructions %></p>
+
+<a href="/">← Back to recipes</a>
+
+<%- include('partials/footer') %>
+
+

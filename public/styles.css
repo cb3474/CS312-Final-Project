@@ -1,0 +1,32 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+  background-color: #fafafa;
+}
+
+.recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fff;
+}
+
+.recipe-card a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.recipe-card a:hover {
+  color: #ff6347;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #ffebcd;
+  margin-right: 5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
