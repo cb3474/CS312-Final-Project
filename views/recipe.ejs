@@ -1,11 +1,32 @@
 <%- include('partials/header') %>
 
-<h1><%= recipe.title %></h1>
-<p><strong>By:</strong> <%= recipe.author %></p>
-<p><strong>Cuisine:</strong> <%= recipe.cuisine %></p>
-<p><strong>Meal Type:</strong> <%= recipe.meal_type %></p>
-<p><strong>Difficulty:</strong> <%= recipe.difficulty %></p>
-<p><strong>Cooking Time:</strong> <%= recipe.cooking_time %> mins</p>
+<div class="recipe-header">
+  <div class="recipe-image">
+    <% if (recipe.image_url) { %>
+      <img src="<%= recipe.image_url %>" alt="<%= recipe.title %>">
+    <% } else { %>
+      <div class="placeholder-image">No Image</div>
+    <% } %>
+  </div>
+
+  <div class="recipe-info">
+    <h1 class="recipe-title"><%= recipe.title %></h1>
+    <div class="recipe-rating">
+      <div class="rating" data-id="<%= recipe.id %>">
+        <% for(let i = 5; i >= 1; i--) { %>
+          <span data-value="<%= i %>">&#9733;</span>
+        <% } %>
+      </div>
+    </div>
+    <div class="recipe-details">
+      <p><strong>By:</strong> <%= recipe.author %></p>
+      <p><strong>Cuisine:</strong> <%= recipe.cuisine %></p>
+      <p><strong>Meal Type:</strong> <%= recipe.meal_type %></p>
+      <p><strong>Difficulty:</strong> <%= recipe.difficulty %></p>
+      <p><strong>Cooking Time:</strong> <%= recipe.cooking_time %> mins</p>
+    </div>
+  </div>
+</div>
 
 <h3>Ingredients</h3>
 <ul>
@@ -24,8 +45,9 @@
 <h3>Instructions</h3>
 <p><%= recipe.instructions %></p>
 
-<a href="/">← Back to recipes</a>
+<a href="/" class="back-link">← Back to recipes</a>
 
+<script src="/rating.js"></script>
 <%- include('partials/footer') %>
 
 
