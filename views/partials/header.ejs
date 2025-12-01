@@ -10,3 +10,10 @@
     <h2><a href="/">🍴 Recipe App</a></h2>
     <hr>
   </header>
+  <div class="auth-buttons">
+    <% if (global.currentUser)  %>
+    <span class="welcome-text">Logged in as: <strong><%= global.currentUser.username %></strong></span>
+  <a href="/signup" class="auth-btn">Sign Up</a>
+  <a href="/login" class="auth-btn">Login</a>
+</div>
+

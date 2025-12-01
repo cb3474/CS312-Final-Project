@@ -3,6 +3,7 @@ import pool from './database.js';
 import recipeRoutes from './routes/recipe_routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import loginRoutes from './routes/login_routes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/', recipeRoutes);
+app.use('/', loginRoutes);
 
 const PORT = 5000;
 
