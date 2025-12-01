@@ -1,6 +1,7 @@
 import express from 'express';
 import pool from '../database.js';
 import { getRecipes, getRecipeById, createRecipe } from '../Control/recipe_control.js';
+import { addComment } from '../Control/recipe_control.js';
 
 
 const router = express.Router();
@@ -12,6 +13,8 @@ router.get('/recipes/new', (req, res) => {
 });
 
 router.post('/recipes', createRecipe);
+
+router.post('/recipe/:recipeId/comment', addComment);
 
 router.get('/search', async (req, res) => {
   const { q } = req.query;

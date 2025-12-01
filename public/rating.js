@@ -25,7 +25,7 @@ stars.forEach(star => {
       next = next.nextElementSibling;
     }
     
-    // Send rating to backend
+    
     await fetch(`/recipes/${recipeId}/rate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

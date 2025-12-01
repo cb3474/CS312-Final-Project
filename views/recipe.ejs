@@ -50,4 +50,26 @@
 <script src="/rating.js"></script>
 <%- include('partials/footer') %>
 
+<h3>Comments</h3>
+
+<div class="comments-section">
+  <% if (comments && comments.length) { %>
+  <% comments.forEach(comment => { %>
+    <div class="comment">
+      <p><strong><%= comment.username %>:</strong> <%= comment.content %></p>
+    </div>
+  <% }) %>
+
+  <% } else { %>
+    <p>No comments yet. Be the first to comment!</p>
+  <% } %>
+</div>
+
+<h4>Add a Comment</h4>
+<form action="/recipe/<%= recipe.id %>/comment" method="POST">
+  <input type="text" name="username" placeholder="Your name" required>
+  <textarea name="content" placeholder="Your comment" required></textarea>
+  <button type="submit">Post Comment</button>
+</form>
+
 
