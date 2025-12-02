@@ -70,6 +70,8 @@ body {
 .btn-add-recipe {
   display: inline-block;
   padding: 10px 20px;
+  margin-bottom: 10px;
+  margin-right: 10px;
   background-color: #ff6347;    
   color: white;
   font-weight: bold;
@@ -150,5 +152,51 @@ body {
   background-color: #ff6347;
   color: white;
 }
+
+.search-container {
+  display: flex;
+  justify-content: flex-end; 
+}
+
+.search-form input {
+  padding: 5px 8px;
+}
+
+.search-form button {
+  padding: 5px 10px;
+}
+
+.auth-buttons {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-create {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;        
+  transition: background-color 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.btn-create:hover {
+  background-color: crimson;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+
 
 

@@ -5,8 +5,28 @@
   <title>Recipe Sharing Website</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+
   <header>
     <h2><a href="/">🍴 Recipe App</a></h2>
     <hr>
   </header>
+  <div class="header-bottom">
+  <div class="auth-buttons">
+    <% if (global.currentUser) { %>
+      <span class="welcome-text">Logged in as: 
+        <strong><%= global.currentUser.username %></strong>
+      </span>
+    <% } else { %>
+      <a href="/signup" class="btn-add-recipe">Sign Up</a>
+      <a href="/login" class="btn-add-recipe">Login</a>
+    <% } %>
+  </div>
+
+  <div class="search-container">
+    <form action="/search" method="GET" class="search-form">
+      <input type="text" name="q" placeholder="Search recipes..." required>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</div>
+
