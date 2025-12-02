@@ -11,124 +11,154 @@ export const getRecipes = async (req, res) => {
     `);
 
     // Render the 'index.ejs' template and pass recipes
-    res.render('index', { recipes: result.rows });
+    res.render("index", { recipes: result.rows, user: req.session.user });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error retrieving recipes');
   }
 };
 
+// Recipe details page
 export const getRecipeById = async (req, res) => {
   const { id } = req.params;
+
   try {
-    // Get the recipe
+    // Get logged in user (if any)
+    const currentUser = req.session?.user || null;
+
+    // 1️⃣ Get recipe details
     const recipeRes = await pool.query(
-      'SELECT r.*, u.username AS author FROM recipes r JOIN users u ON r.created_by = u.id WHERE r.id=$1',
+      `SELECT r.*, u.username AS author
+       FROM recipes r
+       JOIN users u ON r.created_by = u.id
+       WHERE r.id = $1`,
       [id]
     );
 
-    if (!recipeRes.rows.length) return res.status(404).send('Recipe not found');
+    if (!recipeRes.rows.length) {
+      return res.status(404).send("Recipe not found");
+    }
 
-    // Get ingredients
+    // 2️⃣ Get ingredients
     const ingredientsRes = await pool.query(
-      'SELECT i.name FROM ingredients i JOIN recipe_ingredients ri ON i.id = ri.ingredient_id WHERE ri.recipe_id=$1',
+      `SELECT i.name
+       FROM ingredients i
+       JOIN recipe_ingredients ri ON i.id = ri.ingredient_id
+       WHERE ri.recipe_id = $1`,
       [id]
     );
 
-    // Get tags
+    // 3️⃣ Get tags
     const tagsRes = await pool.query(
-      'SELECT t.name FROM tags t JOIN recipe_tags rt ON t.id = rt.tag_id WHERE rt.recipe_id=$1',
+      `SELECT t.name
+       FROM tags t
+       JOIN recipe_tags rt ON t.id = rt.tag_id
+       WHERE rt.recipe_id = $1`,
       [id]
     );
 
-    
+    // 4️⃣ Check if bookmarked by this user
+    const bookmarkRes = currentUser
+      ? await pool.query(
+          "SELECT 1 FROM bookmarks WHERE user_id=$1 AND recipe_id=$2",
+          [currentUser.id, id]
+        )
+      : { rows: [] };
 
-    // Get comments
-    const commentsRes = await pool.query(
-      'SELECT * FROM comments WHERE recipe_id=$1 ORDER BY created_at DESC',
-      [id]
-    );
+    const isBookmarked = bookmarkRes.rows.length > 0;
 
-    //Debugging
-    //console.log("Fetched comments:", commentsRes.rows);
-
-    // Render the page with everything
-    res.render('recipe', {
-      recipe: recipeRes.rows[0],
+    // 5️⃣ Render the page
+    res.render("recipe", {
+      recipe: {
+        ...recipeRes.rows[0],
+        isBookmarked
+      },
       ingredients: ingredientsRes.rows,
       tags: tagsRes.rows,
-      comments: commentsRes.rows
+      user: currentUser
+    });
+
+  } catch (err) {
+    console.error("❌ Error in getRecipeById:", err);
+    res.status(500).send("Error retrieving recipe details");
+  }
+};
+
+
+export const addBookmark = async (req, res) => {
+
+  try {
+   
+
+   if (!req.session.user) return res.status(401).send("You must be logged in."); 
+    
+    const userId = req.session.user.id;  
+    const recipeId = req.params.id;
+
+    await pool.query(
+      "INSERT INTO bookmarks (user_id, recipe_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+      [userId, recipeId]
+    );
+
+    res.redirect(`/recipe/${recipeId}`);
+  } catch (err) {
+    console.error("❌ Bookmark Error:", err);
+    res.status(500).send("Error bookmarking recipe");
+  }
+};
+
+export const removeBookmark = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const recipeId = req.params.id;
+
+    await pool.query(
+      "DELETE FROM bookmarks WHERE user_id = $1 AND recipe_id = $2;",
+      [userId, recipeId]
+    );
+
+    res.redirect(`/recipe/${recipeId}`);
+  } catch (err) {
+    console.error("❌ Remove Bookmark Error:", err);
+    res.status(500).send("Error removing bookmark");
+  }
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    // Get user info
+    const userRes = await pool.query(
+      "SELECT id, username, bio, created_at FROM users WHERE username=$1",
+      [username]
+    );
+    if (!userRes.rows.length) return res.status(404).send("User not found");
+
+    const userId = userRes.rows[0].id;
+
+    // Get recipes uploaded
+    const recipesRes = await pool.query(
+      "SELECT * FROM recipes WHERE created_by=$1 ORDER BY created_at DESC",
+      [userId]
+    );
+
+    // Get saved bookmarks
+    const savesRes = await pool.query(
+      `SELECT r.* FROM recipes r
+       JOIN bookmarks b ON r.id = b.recipe_id
+       WHERE b.user_id = $1`,
+      [userId]
+    );
+
+    res.render("profile", {
+      profile: userRes.rows[0],
+      recipes: recipesRes.rows,
+      savedRecipes: savesRes.rows
     });
 
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error retrieving recipe details');
-  }
-};
-
-
-
-export const createRecipe = async (req, res) => {
-  const { title, cuisine, meal_type, difficulty, cooking_time } = req.body;
-
-  const created_by = 1; 
-
-  try {
-    const result = await pool.query(
-      `INSERT INTO recipes (title, cuisine, meal_type, difficulty, cooking_time, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id`,
-      [title, cuisine, meal_type, difficulty, cooking_time, created_by]
-    );
-
-    const newId = result.rows[0].id;
-
-    res.redirect(`/recipe/${newId}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error creating recipe");
-  }
-};
-
-
-// Get comments for a recipe
-export const getCommentsByRecipeId = async (recipeId) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM comments WHERE recipe_id=$1 ORDER BY created_at DESC',
-      [recipeId]
-    );
-    return result.rows;
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
-};
-
-// Add a comment
-export const addComment = async (req, res) => {
-  const { recipeId } = req.params;
-  const { username, content } = req.body;
-
-  //Debugging
-   //console.log("POST /recipe/:id/comment received:", { recipeId, username, content });
-
-  if (!username || !content) {
-    return res.status(400).send('Username and content are required');
-  }
-
-  try {
-    await pool.query(
-      'INSERT INTO comments (recipe_id, username, content) VALUES ($1, $2, $3)',
-      [recipeId, username, content]
-    );
-
-    //Debugging
-    //console.log("Comment inserted successfully");
-
-    res.redirect(`/recipe/${recipeId}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error adding comment');
+    res.status(500).send("Error loading profile");
   }
 };
