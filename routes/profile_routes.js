@@ -10,42 +10,39 @@ const formatDate = (date) =>
     day: "numeric"
   });
 
-router.get("/profile", async (req, res) => {
-
-});
-
 // Show profile page
 router.get("/profile", async (req, res) => {
-    const user = req.session?.user;
+  const user = global.currentUser;
 
-    if (!user) return res.redirect("/login");
+  if (!user) return res.redirect("/login");
 
-    try {
-        // fetch user recipes
-        const myRecipes = await pool.query(
-            "SELECT id, title, cuisine FROM recipes WHERE created_by = $1",
-            [user.id]
-        );
+  try {
+    // fetch user recipes
+    const myRecipes = await pool.query(
+      "SELECT id, title, cuisine FROM recipes WHERE created_by = $1",
+      [user.id]
+    );
 
-        // fetch bookmarks
-        const bookmarks = await pool.query(
-            `SELECT r.id, r.title, r.cuisine
-             FROM bookmarks b
-             JOIN recipes r ON r.id = b.recipe_id
-             WHERE b.user_id = $1`,
-            [user.id]
-        );
+    // fetch bookmarks
+    const bookmarks = await pool.query(
+      `SELECT r.id, r.title, r.cuisine
+       FROM bookmarks b
+       JOIN recipes r ON r.id = b.recipe_id
+       WHERE b.user_id = $1`,
+      [user.id]
+    );
 
-        res.render("profile", {
-            user,
-            myRecipes: myRecipes.rows,
-            bookmarks: bookmarks.rows
-        });
+    res.render("profile", {
+      user,
+      myRecipes: myRecipes.rows,
+      bookmarks: bookmarks.rows,
+      formatDate
+    });
 
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error loading profile");
-    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading profile");
+  }
 });
 
 export default router;

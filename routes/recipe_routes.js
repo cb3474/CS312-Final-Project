@@ -1,18 +1,33 @@
-import express from 'express';
-import { getRecipes, getRecipeById } from '../Control/recipe_control.js';
+import express from "express";
+import { createRecipe } from "../Control/recipe_control.js";
+
+
+
+import {
+  getRecipes,
+  getRecipeById,
+  addBookmark,
+  removeBookmark,
+  newRecipeForm   // you still need to define this controller
+} from "../Control/recipe_control.js";
 
 const router = express.Router();
 
-router.get('/', getRecipes);
-router.get('/recipe/:id', getRecipeById);
+// Home page — list all recipes
+router.get("/", getRecipes);
 
-export default router;
+router.post("/recipes", createRecipe);
 
-import { addBookmark, removeBookmark } from "../Control/recipe_control.js";
+// Add recipe form page
+router.get("/recipes/new", newRecipeForm);
 
-// POST /bookmark/add/:id
+// Recipe details
+router.get("/recipe/:id", getRecipeById);
+
+// Add bookmark
 router.post("/add/:id", addBookmark);
 
-// POST /bookmark/remove/:id
+// Remove bookmark
 router.post("/remove/:id", removeBookmark);
 
+export default router;
