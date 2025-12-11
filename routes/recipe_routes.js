@@ -1,20 +1,21 @@
 import express from "express";
-import { createRecipe } from "../Control/recipe_control.js";
-
-
-
-import {
+import { 
+  createRecipe,
   getRecipes,
   getRecipeById,
   addBookmark,
   removeBookmark,
-  newRecipeForm   // you still need to define this controller
+  newRecipeForm,
+  searchRecipes    // ← import this
 } from "../Control/recipe_control.js";
 
 const router = express.Router();
 
 // Home page — list all recipes
 router.get("/", getRecipes);
+
+// Search page / results
+router.get("/search", searchRecipes);   // ← NEW ROUTE
 
 router.post("/recipes", createRecipe);
 

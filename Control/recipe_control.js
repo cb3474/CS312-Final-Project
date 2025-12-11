@@ -1,3 +1,4 @@
+
 import pool from '../database.js';
 
 // Home page: show all recipes
@@ -53,21 +54,22 @@ export const getRecipeById = async (req, res) => {
       [id]
     );
 
-    // 4️⃣ Check if bookmarked by this user
-    const bookmarkRes = currentUser
+    //Bookmarks, does not currently work!
+
+    /* const bookmarkRes = currentUser
       ? await pool.query(
           "SELECT 1 FROM bookmarks WHERE user_id=$1 AND recipe_id=$2",
           [currentUser.id, id]
         )
       : { rows: [] };
 
-    const isBookmarked = bookmarkRes.rows.length > 0;
+    const isBookmarked = bookmarkRes.rows.length > 0; */
 
-    // 5️⃣ Render the page
+    
     res.render("recipe", {
       recipe: {
         ...recipeRes.rows[0],
-        isBookmarked
+        //isBookmarked
       },
       ingredients: ingredientsRes.rows,
       tags: tagsRes.rows,
@@ -88,6 +90,8 @@ export const newRecipeForm = (req, res) => {
 // POST /recipes — actually create the recipe
 export const createRecipe = async (req, res) => {
   const { title, cuisine, meal_type, difficulty, cooking_time, instructions } = req.body;
+
+  console.log("Current user:", global.currentUser);
 
   try {
     await pool.query(
@@ -180,5 +184,22 @@ export const getProfile = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error loading profile");
+  }
+};
+
+export const searchRecipes = async (req, res) => {
+  const q = req.query.q;  // get the search term from the form
+
+  try {
+    const results = await pool.query(
+      `SELECT * FROM recipes
+       WHERE title ILIKE $1 OR cuisine ILIKE $1`,
+      [`%${q}%`]
+    );
+
+    res.render("searchResults", { results: results.rows, query: q });
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).send("Server error");
   }
 };

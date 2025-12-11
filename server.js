@@ -1,9 +1,10 @@
 import express from 'express';
 import pool from './database.js';
+import loginRoutes from './routes/login_routes.js';
 import recipeRoutes from './routes/recipe_routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import loginRoutes from './routes/login_routes.js';
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
