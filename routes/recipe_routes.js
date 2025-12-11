@@ -1,18 +1,34 @@
-import express from 'express';
-import { getRecipes, getRecipeById } from '../Control/recipe_control.js';
+import express from "express";
+import { 
+  createRecipe,
+  getRecipes,
+  getRecipeById,
+  addBookmark,
+  removeBookmark,
+  newRecipeForm,
+  searchRecipes    // ← import this
+} from "../Control/recipe_control.js";
 
 const router = express.Router();
 
-router.get('/', getRecipes);
-router.get('/recipe/:id', getRecipeById);
+// Home page — list all recipes
+router.get("/", getRecipes);
 
-export default router;
+// Search page / results
+router.get("/search", searchRecipes);   // ← NEW ROUTE
 
-import { addBookmark, removeBookmark } from "../Control/recipe_control.js";
+router.post("/recipes", createRecipe);
 
-// POST /bookmark/add/:id
+// Add recipe form page
+router.get("/recipes/new", newRecipeForm);
+
+// Recipe details
+router.get("/recipe/:id", getRecipeById);
+
+// Add bookmark
 router.post("/add/:id", addBookmark);
 
-// POST /bookmark/remove/:id
+// Remove bookmark
 router.post("/remove/:id", removeBookmark);
 
+export default router;
